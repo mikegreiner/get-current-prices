@@ -1008,6 +1008,9 @@ Examples:
   %(prog)s BTC SOL ETH
   %(prog)s BTC,SOL,ETH
   
+  # Show version
+  %(prog)s --version
+  
   # From file (auto-detects CSV, JSON, or free-form text)
   %(prog)s -f input/sample-symbol-and-prices.txt
   %(prog)s --file prices.csv
@@ -1038,6 +1041,12 @@ Examples:
   %(prog)s -f prices.txt -S change_pct
   %(prog)s -f prices.txt --sort change_usd --sort-reverse
         """
+    )
+    
+    parser.add_argument(
+        '--version',
+        action='version',
+        version=f'%(prog)s {__version__}'
     )
     
     parser.add_argument(
