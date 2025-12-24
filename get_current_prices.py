@@ -1010,9 +1010,11 @@ Examples:
   %(prog)s --file prices.csv
   %(prog)s --file prices.json
   
-  # JSON output
-  %(prog)s BTC SOL -j
-  %(prog)s -f prices.txt --json
+  # Output formats
+  %(prog)s BTC SOL -j                    # JSON output (shorthand)
+  %(prog)s BTC SOL --output-format json  # JSON output
+  %(prog)s BTC SOL --output-format csv   # CSV output
+  %(prog)s -f prices.txt -o csv          # CSV with comparison data
   
   # With delay between API calls
   %(prog)s -f prices.txt -d 1.0
@@ -1055,6 +1057,16 @@ Examples:
         action='store_true',
         dest='json',
         help='Output results as JSON instead of formatted table'
+    )
+    
+    parser.add_argument(
+        '-o', '--output-format',
+        type=str,
+        choices=['table', 'json', 'csv'],
+        default='table',
+        metavar='FORMAT',
+        dest='output_format',
+        help='Output format: table (default), json, or csv. -j/--json is shorthand for --output-format json.'
     )
     
     parser.add_argument(
@@ -1235,8 +1247,14 @@ Examples:
     # So at this point, results already only contain the filtered symbols
     # We still need filter_symbols_list for the display function to show the filter note
     
+    # Determine if we're in comparison mode
+    compare_mode = bool(provided_prices)
+    
+    # Determine output format (--json flag overrides --output-format)
+    output_format = 'json' if args.json else args.output_format
+    
     # Output results
-    if args.json:
+    if output_format == 'json':
         # Apply symbol filter first
         filtered_results = results
         if filter_symbols_list:
@@ -1313,7 +1331,54 @@ Examples:
                 output['comparisons'] = {symbol: comp for _, symbol, comp in sorted_items}
         
         print(json.dumps(output, indent=2))
+    elif output_format == 'csv':
+        # Output as CSV
+        # Determine if we're in comparison mode
+        compare_mode = bool(provided_prices)
+        
+        # Apply sorting to results before CSV output
+        sorted_results = sort_results(results, args.sort_by, provided_prices, args.sort_reverse)
+        
+        # Apply filters if needed (same logic as table output)
+        filtered_results = sorted_results
+        if filter_symbols_list:
+            symbol_set = {s.upper() for s in filter_symbols_list}
+            filtered_results = [(symbol, price) for symbol, price in filtered_results if symbol.upper() in symbol_set]
+        
+        if compare_mode and provided_prices and args.filter_direction and args.filter_direction.lower() != 'all':
+            direction_filtered = []
+            for symbol, current_price in filtered_results:
+                provided_price = provided_prices.get(symbol)
+                if current_price is not None and provided_price is not None:
+                    _, _, _, status_text = calculate_change(current_price, provided_price)
+                    if status_text.lower() == args.filter_direction.lower():
+                        direction_filtered.append((symbol, current_price))
+            filtered_results = direction_filtered
+        
+        writer = csv.writer(sys.stdout)
+        
+        if compare_mode and provided_prices:
+            # CSV with comparison data
+            writer.writerow(['symbol', 'provided_price', 'current_price', 'change_usd', 'change_percent', 'status'])
+            for symbol, current_price in filtered_results:
+                provided_price = provided_prices.get(symbol)
+                if current_price is None:
+                    writer.writerow([symbol, provided_price if provided_price else '', 'N/A', 'N/A', 'N/A', 'Not found'])
+                elif provided_price is None:
+                    writer.writerow([symbol, '', current_price, 'N/A', 'N/A', 'Found'])
+                else:
+                    abs_change, pct_change, status_symbol, status_text = calculate_change(current_price, provided_price)
+                    writer.writerow([symbol, provided_price, current_price, abs_change, pct_change, status_text])
+        else:
+            # Simple CSV with just symbol and price
+            writer.writerow(['symbol', 'price_usd', 'status'])
+            for symbol, price in filtered_results:
+                if price is not None:
+                    writer.writerow([symbol, price, 'Found'])
+                else:
+                    writer.writerow([symbol, '', 'Not found'])
     else:
+        # Default: table output
         print_price_table(results, compare_mode=bool(provided_prices), provided_prices=provided_prices, filter_direction=args.filter_direction, filter_symbols=filter_symbols_list, sort_by=args.sort_by, sort_reverse=args.sort_reverse, quiet=args.quiet)
 
 

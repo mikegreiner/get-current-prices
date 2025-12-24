@@ -183,10 +183,23 @@ python get_current_prices.py --file prices.txt -S change_pct --sort-reverse
 python get_current_prices.py --file prices.txt -S current_price
 ```
 
-### JSON Output
+### Output Formats
 
+**Table (default):**
 ```bash
-python get_current_prices.py BTC SOL --json
+python get_current_prices.py BTC SOL
+```
+
+**JSON:**
+```bash
+python get_current_prices.py BTC SOL -j
+python get_current_prices.py BTC SOL --output-format json
+```
+
+**CSV:**
+```bash
+python get_current_prices.py BTC SOL -o csv
+python get_current_prices.py -f prices.csv -o csv  # CSV with comparison data
 ```
 
 ### Quiet Mode
@@ -272,6 +285,28 @@ Compared 2 symbols with provided prices
   }
 }
 ```
+
+### CSV Output
+
+**Simple (no comparison):**
+```csv
+symbol,price_usd,status
+BTC,87328.89,Found
+ETH,2932.75,Found
+```
+
+**With comparison data:**
+```csv
+symbol,provided_price,current_price,change_usd,change_percent,status
+BTC,45000.00,87328.89,42328.89,94.06,Up
+ETH,2900.00,2932.75,32.75,1.13,Up
+```
+
+CSV output is perfect for:
+- Importing into spreadsheets (Excel, Google Sheets)
+- Further data processing/analysis
+- Round-trip workflows (CSV in → CSV out)
+- Automation and scripting
 
 ## Status Indicators
 
