@@ -2,17 +2,10 @@
 Tests for output format functionality (table, JSON, CSV).
 """
 
-import pytest
 import json
-import csv
 import sys
 import io
 from unittest.mock import patch, MagicMock
-from get_current_prices import (
-    PriceLookup,
-    calculate_change,
-    sort_results
-)
 
 
 class TestCSVOutput:
@@ -161,12 +154,14 @@ class TestCSVOutput:
                     except ValueError:
                         pass
             
-            # Extract just prices
+            # Extract just prices in order
             prices = [price for _, price in symbol_price_pairs]
+            symbols = [symbol for symbol, _ in symbol_price_pairs]
             
-            # Verify that sorting is applied and we got all expected prices
-            # Note: The exact sort order depends on sort_results implementation
-            # The key test is that CSV output is generated correctly with sorting options
+            # Verify that sorting is actually applied correctly
+            # With --sort-reverse and sort_by='current_price', the default descending order
+            # should be reversed to ascending (lowest first)
+            # Expected order with --sort-reverse: SOL (120.0), ETH (2900.0), BTC (87000.0)
             if len(prices) > 1:
                 # Verify we got all expected prices
                 assert set(prices) == {120.0, 2900.0, 87000.0}, f"Missing expected prices. Got: {prices}"
@@ -175,6 +170,12 @@ class TestCSVOutput:
                 # Verify CSV format is correct (header + data rows)
                 assert len(lines) == 4, f"Expected 4 lines (header + 3 data), got {len(lines)}"
                 assert lines[0] == 'symbol,price_usd,status', "CSV header is incorrect"
+                
+                # Verify actual sort order: with --sort-reverse, should be ascending (lowest first)
+                # The sort_results function defaults to descending for numeric fields,
+                # so --sort-reverse should reverse that to ascending
+                expected_order_ascending = [120.0, 2900.0, 87000.0]
+                assert prices == expected_order_ascending, f"Prices not sorted correctly with --sort-reverse. Got: {prices}, Expected ascending: {expected_order_ascending}"
 
 
 class TestJSONOutput:

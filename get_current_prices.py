@@ -18,8 +18,9 @@ Usage:
     python get_current_prices.py --file prices.csv
     python get_current_prices.py --file prices.json
     
-    # JSON output
-    python get_current_prices.py --file prices.txt --json
+    # Output formats
+    python get_current_prices.py --file prices.txt --json  # JSON output
+    python get_current_prices.py BTC SOL -o csv            # CSV output
 """
 
 import argparse
