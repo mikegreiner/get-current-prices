@@ -23,6 +23,8 @@ Usage:
     python get_current_prices.py BTC SOL -o csv            # CSV output
 """
 
+__version__ = "1.2.0"
+
 import argparse
 import csv
 import json

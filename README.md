@@ -2,6 +2,8 @@
 
 A command-line tool to get current USD prices for cryptocurrency symbols with optional price comparison.
 
+**Version:** 1.2.0
+
 ## Table of Contents
 
 - [Features](#features)
