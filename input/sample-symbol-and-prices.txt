@@ -14,4 +14,4 @@
 - RENDER (Coinbase, Kraken, $1.2732)
 - SUPER (Kraken only, most is still staked, $0.2206)
 - SYRUP (Kraken, $0.31740)
-- WILD (bikemike.eth, $0.0474)
+- WILD (example.eth, $0.0474)

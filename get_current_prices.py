@@ -178,7 +178,7 @@ class PriceLookup:
     def __init__(self, quiet: bool = False):
         self.session = requests.Session()
         self.session.headers.update({
-            'User-Agent': 'Koinly-Price-Lookup/1.0'
+            'User-Agent': 'Crypto-Price-Lookup/1.0'
         })
         self.quiet = quiet
         # Cache for symbol to CoinGecko ID mapping
