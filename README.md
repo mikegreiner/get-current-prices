@@ -1,0 +1,237 @@
+# get-current-prices
+
+A command-line tool to get current USD prices for cryptocurrency symbols with optional price comparison.
+
+## Features
+
+- **Multiple price sources**: DefiLlama API (primary, no rate limits) with CoinGecko fallback
+- **Price comparison**: Compare current prices to provided historical prices
+- **Flexible input**: Command-line arguments, CSV, JSON, or free-form text files
+- **Smart filtering**: Filter by symbol and/or price direction (up/down/unchanged)
+- **Sorting**: Sort by any column (symbol, price, change %, etc.)
+- **Auto-mapping**: Automatically discovers and saves new symbol mappings
+- **Validation**: Cross-checks prices from multiple sources to catch mapping errors
+- **Quiet mode**: Clean output for scripting/automation
+
+## Installation
+
+No installation required - just run the Python script directly:
+
+```bash
+python get_current_prices.py BTC SOL ETH
+```
+
+Requires Python 3.7+ and the `requests` library:
+
+```bash
+pip install requests
+```
+
+## Quick Start
+
+```bash
+# Get prices for symbols
+python get_current_prices.py BTC SOL ETH
+
+# From file with price comparison
+python get_current_prices.py --file input/sample-symbol-and-prices.txt
+
+# Filter and sort
+python get_current_prices.py --file prices.txt -F up -S change_pct
+
+# Quiet mode (for scripting)
+python get_current_prices.py BTC ETH -q
+```
+
+## Usage
+
+### Command-Line Symbols
+
+```bash
+# Space-separated
+python get_current_prices.py BTC SOL ETH
+
+# Comma-separated
+python get_current_prices.py BTC,SOL,ETH
+```
+
+### File Input
+
+The tool auto-detects file format (CSV, JSON, or free-form text):
+
+```bash
+python get_current_prices.py --file prices.csv
+python get_current_prices.py --file prices.json
+python get_current_prices.py --file prices.txt
+```
+
+### File Formats
+
+**CSV:**
+```csv
+symbol,price,notes
+BTC,45000.00,Bought on Coinbase
+SOL,95.50,Purchased on Kraken
+```
+
+**JSON:**
+```json
+[
+  {"symbol": "BTC", "price": 45000.00, "notes": "Bought on Coinbase"},
+  {"symbol": "SOL", "price": 95.50, "notes": "Purchased on Kraken"}
+]
+```
+
+**Free-form text:**
+```
+- BTC (Coinbase, $45,000.00)
+- SOL (Kraken, $95.50)
+- ETH (Coinbase $2,900.00)
+```
+
+## Options
+
+- `-f, --file FILE`: Input file with symbols (CSV, JSON, or free-form text)
+- `-j, --json`: Output results as JSON instead of formatted table
+- `-q, --quiet`: Suppress all progress messages (only show results)
+- `-s, --filter-symbol SYMBOLS`: Filter by symbol(s), comma-separated (e.g., BTC,ETH)
+- `-F, --filter DIRECTION`: Filter by price direction: `up`, `down`, `unchanged`, or `all`
+- `-S, --sort FIELD`: Sort by field: `symbol`, `provided_price`, `current_price`, `change_usd`, `change_pct`, `status`
+- `--sort-reverse`: Reverse the sort order
+- `-d, --delay SECONDS`: Delay between API calls (default: 0.5)
+- `-h, --help`: Show help message
+
+## Examples
+
+### Basic Price Lookup
+
+```bash
+python get_current_prices.py BTC SOL ETH
+```
+
+### Price Comparison
+
+```bash
+# File contains symbols and prices
+python get_current_prices.py --file input/sample-symbol-and-prices.txt
+```
+
+### Filtering
+
+```bash
+# Show only coins that went up
+python get_current_prices.py --file prices.txt -F up
+
+# Show only specific symbols
+python get_current_prices.py --file prices.txt -s BTC,ETH,SOL
+
+# Combine filters
+python get_current_prices.py --file prices.txt -F up -s BTC,ETH
+```
+
+### Sorting
+
+```bash
+# Sort by percentage change (highest first)
+python get_current_prices.py --file prices.txt -S change_pct
+
+# Sort by percentage change (lowest first)
+python get_current_prices.py --file prices.txt -S change_pct --sort-reverse
+
+# Sort by current price
+python get_current_prices.py --file prices.txt -S current_price
+```
+
+### JSON Output
+
+```bash
+python get_current_prices.py BTC SOL --json
+```
+
+### Quiet Mode
+
+```bash
+# Clean output for scripting
+python get_current_prices.py BTC ETH -q
+```
+
+## Symbol Mappings
+
+The tool uses `symbol_mappings.json` to map symbols to CoinGecko IDs. This file:
+
+- Is automatically created on first run with default mappings
+- Can be edited to add/modify/fix mappings
+- Automatically grows as new symbols are used
+- Falls back to hardcoded defaults if the file is missing
+
+**To fix a wrong mapping:**
+1. Edit `symbol_mappings.json`
+2. Change the mapping: `"SYMBOL": "correct-coingecko-id"`
+3. Save and run again
+
+**New symbols** are automatically:
+- Looked up via CoinGecko search API
+- Validated by cross-checking prices from multiple sources
+- Saved to `symbol_mappings.json` for future use
+
+## Price Sources
+
+1. **DefiLlama API** (primary)
+   - No rate limits
+   - Batch requests supported
+   - Uses CoinGecko IDs
+
+2. **CoinGecko API** (fallback)
+   - Rate-limited (free tier: 10-50 calls/minute)
+   - Used when DefiLlama doesn't have the price
+   - Also used for symbol search
+
+## Output Format
+
+### Table Output (Default)
+
+```
+========================================================================================================================
+PRICE COMPARISON
+========================================================================================================================
+Symbol     | Provided Price     | Current Price      | Change (USD)    | Change (%)   | Status              
+------------------------------------------------------------------------------------------------------------------------
+BTC        | $45,000.00         | $87,328.89         | $+42328.89      | +94.06%      | ↑ Up       
+ETH        | $2,900.00          | $2,932.75          | $+32.75         | +1.13%       | ↑ Up       
+========================================================================================================================
+
+Found prices for 2 of 2 symbols
+Compared 2 symbols with provided prices
+```
+
+### JSON Output
+
+```json
+{
+  "timestamp": "2025-12-24 12:00:00",
+  "prices": {
+    "BTC": 87328.89,
+    "ETH": 2932.75
+  },
+  "comparisons": {
+    "BTC": {
+      "provided_price": 45000.00,
+      "current_price": 87328.89,
+      "change_usd": 42328.89,
+      "change_percent": 94.06,
+      "status": "Up",
+      "status_symbol": "↑"
+    }
+  }
+}
+```
+
+## Status Indicators
+
+- **↑ Up** (green): Price increased
+- **↓ Down** (red): Price decreased
+- **═ Unchanged**: Price essentially unchanged (<0.01% difference)
+
+## License
+
+MIT

@@ -1,0 +1,7 @@
+[
+  {"symbol": "BTC", "price": 45000.00, "notes": "Bought on Coinbase"},
+  {"symbol": "SOL", "price": 95.50, "notes": "Purchased on Kraken"},
+  {"symbol": "ETH", "price": 2900.00, "notes": "Bought on Coinbase"},
+  {"symbol": "FIL", "price": 1.30, "notes": "From mining"},
+  {"symbol": "LINK", "price": 8.00, "notes": "Dust convert"}
+]
