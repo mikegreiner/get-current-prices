@@ -2,6 +2,20 @@
 
 A command-line tool to get current USD prices for cryptocurrency symbols with optional price comparison.
 
+## Table of Contents
+
+- [Features](#features)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Usage](#usage)
+- [Options](#options)
+- [Examples](#examples)
+- [Symbol Mappings](#symbol-mappings)
+- [Price Sources](#price-sources)
+- [Output Format](#output-format)
+- [Troubleshooting](#troubleshooting)
+- [License](#license)
+
 ## Features
 
 - **Multiple price sources**: DefiLlama API (primary, no rate limits) with CoinGecko fallback
@@ -15,16 +29,43 @@ A command-line tool to get current USD prices for cryptocurrency symbols with op
 
 ## Installation
 
-No installation required - just run the Python script directly:
+### Clone the Repository
 
 ```bash
-python get_current_prices.py BTC SOL ETH
+git clone https://github.com/mikegreiner/get-current-prices.git
+cd get-current-prices
 ```
+
+### Install Dependencies
 
 Requires Python 3.7+ and the `requests` library:
 
 ```bash
+pip install -r requirements.txt
+```
+
+Or install manually:
+
+```bash
 pip install requests
+```
+
+### Make Script Executable (Optional)
+
+```bash
+chmod +x get_current_prices.py
+```
+
+Then you can run it directly:
+
+```bash
+./get_current_prices.py BTC SOL ETH
+```
+
+### Verify Installation
+
+```bash
+python get_current_prices.py --help
 ```
 
 ## Quick Start
@@ -231,6 +272,60 @@ Compared 2 symbols with provided prices
 - **↑ Up** (green): Price increased
 - **↓ Down** (red): Price decreased
 - **═ Unchanged**: Price essentially unchanged (<0.01% difference)
+
+## Troubleshooting
+
+### "ModuleNotFoundError: No module named 'requests'"
+
+Install the required dependency:
+
+```bash
+pip install requests
+```
+
+Or use the requirements file:
+
+```bash
+pip install -r requirements.txt
+```
+
+### "Symbol not found" or Wrong Price
+
+If a symbol returns the wrong price or isn't found:
+
+1. **Check the mapping**: Look in `symbol_mappings.json` to see what CoinGecko ID is mapped
+2. **Fix the mapping**: Edit `symbol_mappings.json` with the correct CoinGecko ID
+3. **Validate**: The tool automatically validates new mappings by cross-checking prices
+
+**Example**: If SYRUP shows the wrong price, check if it's mapped to `pancakeswap-token` (CAKE) instead of `syrup` (Maple Finance).
+
+### Rate Limiting Errors
+
+If you see rate limit errors from CoinGecko:
+
+- The tool automatically retries with exponential backoff
+- DefiLlama (primary source) has no rate limits
+- For large symbol lists, use `-d` to increase delay between API calls:
+
+```bash
+python get_current_prices.py --file large_list.txt -d 1.0
+```
+
+### Price Validation Warnings
+
+If you see warnings about price mismatches:
+
+- This means CoinGecko and DefiLlama returned different prices
+- The tool will skip mappings that fail validation
+- Check if the CoinGecko ID is correct for the symbol
+
+### File Format Issues
+
+**CSV files**: Must have a `symbol` column. `price` and `notes` columns are optional.
+
+**JSON files**: Can be either an array of objects or an object with symbol keys.
+
+**Free-form text**: Must have the symbol at the start of each line (uppercase), followed by optional text and a price starting with `$`.
 
 ## License
 
