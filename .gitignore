@@ -30,3 +30,5 @@ Thumbs.db
 htmlcov/
 *.cover
 .hypothesis/
+.venv-*/
+.test-venv-*/

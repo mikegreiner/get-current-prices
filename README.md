@@ -390,21 +390,17 @@ Run tests with coverage:
 pytest tests/ --cov=get_current_prices --cov-report=term-missing
 ```
 
-**Test on multiple Python versions (recommended before pushing):**
+**Optional: Test on multiple Python versions:**
 
-To catch compatibility issues before pushing to GitHub, test on all Python versions that GitHub Actions uses:
+If you want to test on multiple Python versions locally, you can use:
 
 ```bash
 ./test-matrix.sh
-```
-
-Or using Make:
-
-```bash
+# or
 make test-all
 ```
 
-This will test on Python 3.8, 3.9, 3.10, 3.11, and 3.12 (matching GitHub Actions). It will skip any versions that aren't installed locally.
+**Best Practice**: Test on your primary Python version locally (e.g., `pytest tests/ -v`), and let GitHub Actions handle the full matrix. Setting up all Python versions locally is optional and not required - CI will catch compatibility issues automatically.
 
 ### Test Structure
 
