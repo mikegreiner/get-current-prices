@@ -38,7 +38,7 @@ cd get-current-prices
 
 ### Install Dependencies
 
-Requires Python 3.7+ and the `requests` library:
+Requires Python 3.8+ and the `requests` library:
 
 ```bash
 pip install -r requirements.txt
