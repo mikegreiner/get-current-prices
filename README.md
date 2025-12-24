@@ -221,11 +221,17 @@ The tool uses `symbol_mappings.json` to map symbols to CoinGecko IDs. This file:
    - No rate limits
    - Batch requests supported
    - Uses CoinGecko IDs
+   - **Update frequency**: Prices are updated in near real-time (typically within 1-2 minutes)
+   - Prices are aggregated from multiple exchanges
 
 2. **CoinGecko API** (fallback)
    - Rate-limited (free tier: 10-50 calls/minute)
    - Used when DefiLlama doesn't have the price
    - Also used for symbol search
+   - **Update frequency**: Prices are updated frequently (typically within 1-5 minutes)
+   - Prices are aggregated from multiple exchanges
+
+**Note**: Both services aggregate prices from multiple exchanges, so the prices you see are market averages, not from a single exchange. For most use cases, this provides accurate current market prices.
 
 ## Output Format
 
