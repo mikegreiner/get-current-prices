@@ -327,6 +327,44 @@ If you see warnings about price mismatches:
 
 **Free-form text**: Must have the symbol at the start of each line (uppercase), followed by optional text and a price starting with `$`.
 
+## Development
+
+### Running Tests
+
+The project uses `pytest` for testing. Install test dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Run all tests:
+
+```bash
+pytest tests/ -v
+```
+
+Run tests with coverage:
+
+```bash
+pytest tests/ --cov=get_current_prices --cov-report=term-missing
+```
+
+### Test Structure
+
+Tests are organized by functionality:
+- `test_price_lookup.py` - Price lookup and validation
+- `test_file_parsing.py` - File format parsing (CSV, JSON, text)
+- `test_formatting.py` - Price and change formatting
+- `test_sorting.py` - Result sorting functionality
+
+### Contributing
+
+When contributing:
+1. Add tests for new features
+2. Ensure all tests pass: `pytest tests/ -v`
+3. Maintain test coverage
+4. Follow existing code style
+
 ## License
 
 MIT

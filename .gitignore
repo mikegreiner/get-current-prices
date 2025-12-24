@@ -23,3 +23,10 @@ Thumbs.db
 # Project specific
 # Keep symbol_mappings.json (it's part of the project)
 # Keep input/ directory (sample files)
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+.hypothesis/
