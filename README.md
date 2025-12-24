@@ -378,7 +378,7 @@ The project uses `pytest` for testing. Install test dependencies:
 pip install -r requirements.txt
 ```
 
-Run all tests:
+Run all tests with current Python version:
 
 ```bash
 pytest tests/ -v
@@ -390,6 +390,22 @@ Run tests with coverage:
 pytest tests/ --cov=get_current_prices --cov-report=term-missing
 ```
 
+**Test on multiple Python versions (recommended before pushing):**
+
+To catch compatibility issues before pushing to GitHub, test on all Python versions that GitHub Actions uses:
+
+```bash
+./test-matrix.sh
+```
+
+Or using Make:
+
+```bash
+make test-all
+```
+
+This will test on Python 3.8, 3.9, 3.10, 3.11, and 3.12 (matching GitHub Actions). It will skip any versions that aren't installed locally.
+
 ### Test Structure
 
 Tests are organized by functionality:
@@ -397,6 +413,7 @@ Tests are organized by functionality:
 - `test_file_parsing.py` - File format parsing (CSV, JSON, text)
 - `test_formatting.py` - Price and change formatting
 - `test_sorting.py` - Result sorting functionality
+- `test_output_formats.py` - CSV and JSON output formats
 
 ### Contributing
 
